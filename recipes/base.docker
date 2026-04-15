@@ -1,0 +1,31 @@
+# Base layer for QI Dockerfiles
+
+# Use micromamba base image for a small conda-like environment
+FROM mambaorg/micromamba:2-ubuntu22.04
+USER root
+
+# Install basic OS requirements
+ARG REBUILD_APT=1
+RUN apt-get update -y && \
+    apt-get upgrade -y && \
+    apt-get install -y \
+        openssh-client \
+        git \
+        python3 \
+        python3-pip \
+        build-essential \
+        unzip \
+        libgl1-mesa-glx \
+        libxrender1 \
+        wget \
+        vim \
+        bc \
+        dc && \
+    apt-get clean -y && \
+    apt-get autoclean -y && \
+    apt-get autoremove -y
+
+# Use bash instead of sh as some scripts use bash builtins
+RUN rm /bin/sh && \
+    ln -s /bin/bash /bin/sh
+

@@ -1,0 +1,15 @@
+# Copy CUDIMOT
+
+RUN git clone https://github.com/SPMIC-UoN/cudimot && \
+    cd cudimot && \
+    export FSLDEVDIR=/usr/local/cudimot && \
+    export CUDA=/usr/local/cuda && \
+    source $FSLDIR/etc/fslconf/fsl-devel.sh && \
+    modelname=NODDI_Watson make && \
+    modelname=NODDI_Watson make install && \
+    apt update -y && \
+    apt install libboost-all-dev -y
+
+#$FSLDIR/bin/micromamba -p $FSLDIR uninstall gcc && \
+
+ENV CUDIMOT=/usr/local/cudimot

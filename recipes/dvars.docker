@@ -1,0 +1,4 @@
+ARG REBUILD_DVARS=1
+
+RUN cd /usr/local && \
+    git clone https://github.com/asoroosh/DVARS

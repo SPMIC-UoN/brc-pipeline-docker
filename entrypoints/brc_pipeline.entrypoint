@@ -1,0 +1,5 @@
+# Default entry point is BRC pipeline
+
+COPY scripts/brc_pipeline_entrypoint.py scripts/brc_pipeline.sh /bin/
+
+ENTRYPOINT ["brc_pipeline.sh"]

@@ -1,0 +1,6 @@
+# Install freesurfer
+COPY _deps/freesurfer /usr/local/freesurfer
+COPY licenses/fs_license.txt /usr/local/freesurfer/license.txt
+ENV FREESURFER_HOME=/usr/local/freesurfer/ \
+    FS_LICENSE=/usr/local/freesurfer/license.txt
+RUN echo "source $FREESURFER_HOME/FreeSurferEnv.sh 2>&1 1>/dev/null" >> /usr/local/envrc

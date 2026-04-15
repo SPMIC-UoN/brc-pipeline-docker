@@ -1,0 +1,4 @@
+# fix
+ARG REBUILD_FIX=1
+COPY _deps/fix /usr/local/fix
+ENV FSL_FIXDIR=/usr/local/fix

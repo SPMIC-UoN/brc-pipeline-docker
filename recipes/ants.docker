@@ -1,0 +1,10 @@
+# Ants
+#
+# Apache-2.0 license
+
+RUN wget https://github.com/ANTsX/ANTs/releases/download/v2.5.3/ants-2.5.3-ubuntu-22.04-X64-gcc.zip && \
+    unzip ants-2.5.3-ubuntu-22.04-X64-gcc.zip && \
+    mv ants-2.5.3 /usr/local/ && \
+    rm ants-2.5.3-ubuntu-22.04-X64-gcc.zip
+COPY licenses/ants/* /usr/local/ants-2.5.3
+ENV PATH=$PATH:/usr/local/ants-2.5.3/bin

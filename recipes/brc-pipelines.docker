@@ -1,0 +1,12 @@
+# Install BRC pipeline
+
+#RUN cd /usr/local && \
+#    git clone https://github.com/SPMIC-UoN/BRC_Pipeline && \
+#    find . -type f \( -name "*.sh" -o -name "*.py" \) -exec chmod 755 {} \; && \
+
+COPY _deps/BRC_Pipeline /usr/local/BRC_Pipeline
+COPY scripts/SetUpBRCPipeline.sh /usr/local/BRC_Pipeline/
+
+RUN apt-get install -y \
+        tcsh bc && \
+    echo "source /usr/local/BRC_Pipeline/SetUpBRCPipeline.sh" >> /usr/local/envrc

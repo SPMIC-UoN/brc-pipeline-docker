@@ -1,0 +1,10 @@
+# Get dcm2niix from github and compile
+
+RUN cd /tmp && \
+        apt-get install -y cmake && \
+        git clone https://github.com/rordenlab/dcm2niix.git && \
+        cd dcm2niix && git checkout v1.0.20220720 && mkdir build && cd build && \
+        cmake -DBATCH_VERSION=ON -DUSE_OPENJPEG=ON .. && \
+        make && make install
+ENV PATH=$PATH:/usr/local/bin
+

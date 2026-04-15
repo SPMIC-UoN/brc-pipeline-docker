@@ -1,0 +1,12 @@
+# FSL
+ARG REINSTALL_FSL=1
+COPY scripts/fslinstaller.py .
+RUN mkdir /usr/local/fsl && \
+    python3 fslinstaller.py -o -d /usr/local/fsl/6.0.7.x -V 6.0.7.15 && \
+    rm fslinstaller.py && \
+    rm -rf /usr/local/fsl/6.0.7.x/pkgs && \
+    echo "source /usr/local/fsl/6.0.7.x/etc/fslconf/fsl.sh" >> /usr/local/envrc
+ENV FSLDIR=/usr/local/fsl/6.0.7.x \
+    FSLOUTPUTTYPE=NIFTI_GZ \
+    FSLGECUDAQ=cuda.q \
+    PATH=$FSLDIR/share/fsl/bin:$PATH

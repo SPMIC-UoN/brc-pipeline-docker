@@ -1,0 +1,15 @@
+ARG REBUILD_MCR=1
+RUN mkdir /usr/local/mcr && \
+    mkdir /tmp/mcr-install && \
+    cd /tmp/mcr-install && \
+    wget https://ssd.mathworks.com/supportfiles/downloads/R2023a/Release/8/deployment_files/installer/complete/glnxa64/MATLAB_Runtime_R2023a_Update_8_glnxa64.zip && \
+    #wget https://ssd.mathworks.com/supportfiles/downloads/R2024a/Release/7/deployment_files/installer/complete/glnxa64/MATLAB_Runtime_R2024a_Update_7_glnxa64.zip && \
+    unzip -q MATLAB_Runtime_R2023a_Update_8_glnxa64.zip && \
+    ./install -destinationFolder /usr/local/mcr -agreeToLicense yes -mode silent && \
+    cd / && \
+    rm -rf /tmp/mcr-install && \
+    rm -rf /usr/local/mcr/R2023a/sys/java/jre/glnxa64/jre/ && \
+    echo "export MCRROOT=/usr/local/mcr/R2023a" >> /usr/local/envrc
+ENV MCRROOT=/usr/local/mcr/R2023a \
+    FSL_FIX_MCRROOT=/usr/local/mcr/R2023a \
+    FSL_FIX_MCR=/usr/local/mcr/R2023a
