@@ -120,17 +120,18 @@ log_Msg 2 "13: ${LabelList}"
 #                                    '${LabelList}'); \
 #                                    exit"`
 ${BRC_FMRI_GP_SCR}/FSLNets/run_run_SS_FSL_Nets.sh \
-    '${BRC_FMRI_GP_SCR}/FSLNets' \
-    '${BRC_FMRI_GP_SCR}/L1precision' \
-    '${BRC_FMRI_GP_SCR}/FSLNets' \
-    '${WD}' \
-    '${WD}' \
+    "${MCRROOT}" \
+    "${BRC_FMRI_GP_SCR}/FSLNets" \
+    "${BRC_FMRI_GP_SCR}/L1precision" \
+    "${BRC_FMRI_GP_SCR}/FSLNets" \
+    "${WD}" \
+    "${WD}" \
     ${TR} \
     ${VarNorm} \
-    '${method}' \
+    "${method}" \
     ${RegVal} \
     ${FISHER_R2Z} \
-    '${LabelList}'
+    "${LabelList}"
 
 if [ -e $WD/zero_labels.txt ] ; then
     log_Msg 3 ""

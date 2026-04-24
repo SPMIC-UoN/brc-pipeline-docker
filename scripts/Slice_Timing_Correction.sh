@@ -106,7 +106,7 @@ if [ "$STCMethod" -le 3 ]; then
     #else
     #    ${MATLABpath}/matlab -nojvm -nodesktop -r "addpath('${BRC_FMRI_SCR}'); run_spm_slice_time_correction('${SPMpath}' , '${WD}/prevols/vol' , 'stc_' , '${method}' , ${RepetitionTime}); exit"
     #fi
-    ${BRC_FMRI_SCR}/run_run_spm_slice_time_correction '${SPMpath}' '${WD}/prevols/vol' 'stc_' '${method}' ${RepetitionTime}
+    ${BRC_FMRI_SCR}/run_run_spm_slice_time_correction "${MCRROOT}" "${SPMpath}" "${WD}/prevols/vol" "stc_" "${method}" ${RepetitionTime}
     
     ${FSLDIR}/bin/imcp ${WD}/prevols/stc_* ${WD}/postvols/
 

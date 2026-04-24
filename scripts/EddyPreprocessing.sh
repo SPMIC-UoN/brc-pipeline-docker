@@ -190,7 +190,7 @@ if [ ! $SliceSpec = "NONE" ] ; then
     #else
     #    ${MATLABpath}/matlab -nojvm -nodesktop -r "addpath('${BRC_FMRI_SCR}'); extract_slice_specifications('${SliceSpec}' , '${EddyFolder}/slspec.txt'); exit"
     #fi
-    ${BRC_FMRI_SCR}/run_extract_slice_specifications.sh ${SliceSpec} ${EddyFolder}/slspec.txt
+    ${BRC_FMRI_SCR}/run_extract_slice_specifications.sh "${MCRROOT}" "${SliceSpec}" "${EddyFolder}/slspec.txt"
     
     if [ -e ${EddyFolder}/slspec.txt ] ; then
         EDDY_arg="${EDDY_arg} --slspec=${EddyFolder}/slspec.txt"

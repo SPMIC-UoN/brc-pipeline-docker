@@ -107,7 +107,7 @@ if [[ ${skip_preproc} == "no" ]]; then
         #else
         #    ${MATLABpath}/matlab -nojvm -nodesktop -r "addpath('${BRC_FMRI_SCR}'); extract_slice_specifications('${SliceSpec}' , '${WD}/slspec.txt'); exit"
         #fi
-        ${BRC_FMRI_SCR}/extract_slice_specifications.sh '${SliceSpec}' '${WD}/slspec.txt'
+        ${BRC_FMRI_SCR}/run_extract_slice_specifications.sh "${MCRROOT}" "${SliceSpec}" "${WD}/slspec.txt"
         
         if [ -e ${WD}/slspec.txt ] ; then
             EDDY_arg="${EDDY_arg} --slspec=${WD}/slspec.txt"

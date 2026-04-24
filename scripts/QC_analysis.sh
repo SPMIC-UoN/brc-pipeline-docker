@@ -70,11 +70,12 @@ mkdir -p $WD
 #
 #fi
 ${BRC_FMRI_SCR}/run_run_QC_analysis.sh \
-    '${DVARSpath}' \
-    '${BRC_GLOBAL_DIR}' \
-    '${WD}' \
-    '${InfMRI}' \
-    '${MotionParam}'
+    "${MCRROOT}" \
+    "${DVARSpath}" \
+    "${BRC_GLOBAL_DIR}" \
+    "${WD}" \
+    "${InfMRI}" \
+    "${MotionParam}"
 
 echo 'DVARS.mat:      a vector of size 1xT-1 of classic DVARS measure' > ${WD}/readme.txt
 echo 'DVARS_Stat.mat: a structure contains all the details of the statistical inference' >> ${WD}/readme.txt

@@ -140,20 +140,21 @@ log_Msg 2 "17: ${DesignMatrix}.con"
 #                                    exit"
 
 ${BRC_FMRI_GP_SCR}/FSLNets/run_run_FSL_Nets.sh \
-    '${BRC_FMRI_GP_SCR}/L1precision' \
-    '${BRC_FMRI_GP_SCR}/FSLNets' \
-    '${WD}/${FC_Anal_Folder_name}' \
-    '${WD}/${GruopMaps}' \
-    '${TimeSeriesFolder}' \
+    "${MCRROOT}" \
+    "${BRC_FMRI_GP_SCR}/L1precision" \
+    "${BRC_FMRI_GP_SCR}/FSLNets" \
+    "${WD}/${FC_Anal_Folder_name}" \
+    "${WD}/${GruopMaps}" \
+    "${TimeSeriesFolder}" \
     ${TR} \
     ${VarNorm} \
-    '${method}' \
+    "${method}" \
     ${RegVal} \
     ${FISHER_R2Z} \
-    '${NetWebFolder}' \
-    '${DO_GLM}' \
-    '${DesignMatrix}.mat' \
-    '${ContrastMatrix}.con'
+    "${NetWebFolder}" \
+    "${DO_GLM}" \
+    "${DesignMatrix}.mat" \
+    "${ContrastMatrix}.con"
 
 if [ `cat ${WD}/${FC_Anal_Folder_name}/result.txt` != 0 ]; then
     log_Msg 3 ""
