@@ -8,5 +8,5 @@ COPY _deps/BRC_Pipeline /usr/local/BRC_Pipeline
 COPY scripts/SetUpBRCPipeline.sh /usr/local/BRC_Pipeline/
 
 RUN apt-get install -y \
-        tcsh bc && \
+        tcsh bc libxt6 && \
     echo "source /usr/local/BRC_Pipeline/SetUpBRCPipeline.sh" >> /usr/local/envrc
