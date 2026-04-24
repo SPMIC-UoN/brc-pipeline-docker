@@ -36,7 +36,7 @@ PRODUCTS = {
             "c3d",
             "brc-pipelines",
         ],
-        #"entrypoint": "bash",
+        # "entrypoint": "bash",
         "entrypoint": "brc_pipeline",
         "image_name": "brc-pipeline",
         "use_buildscript_version": True,
@@ -98,35 +98,54 @@ def _download_freesurfer(builddir):
 def _download_brc_pipeline(builddir):
     # Clone BRC pipeline from git as we need to modify some of it and comple the matlab
     deps_dir = builddir / "_deps"
+    scripts_dir = builddir / "scripts"
     deps_dir.mkdir(exist_ok=True)
     pipeline_dir = deps_dir / "BRC_Pipeline"
-    #shutil.rmtree(pipeline_dir, ignore_errors=True)  # Remove old pipeline if exists
+    shutil.rmtree(pipeline_dir, ignore_errors=True)  # Remove old pipeline if exists
     if not pipeline_dir.exists():
-        pwd = os.getcwd()
+        cwd = os.getcwd()
         os.chdir(deps_dir)
         run_command("git clone https://github.com/SPMIC-UoN/BRC_Pipeline")
         os.chdir("BRC_Pipeline")
         run_command("find . -type f \( -name '*.sh' -o -name '*.py' \) -exec chmod 755 {} \;")
+
         # Compile matlab code
         os.chdir("BRC_functional_pipeline/scripts")
         run_command(
-            "mcc -m extract_slice_specifications.m -o extract_slice_specifications"
+            "MATLABPATH="" mcc -m extract_slice_specifications.m -o extract_slice_specifications"
         )
         run_command(
-            "mcc -m run_QC_analysis.m -o run_QC_analysis"
+            "MATLABPATH="" mcc -m run_QC_analysis.m -o run_QC_analysis"
         )
         run_command(
-            "mcc -m run_spm_slice_time_correction.m -o run_spm_slice_time_correction"
+            "MATLABPATH="" mcc -m run_spm_slice_time_correction.m -o run_spm_slice_time_correction"
         )
         os.chdir("../..")
         os.chdir("BRC_func_group_analysis/scripts/FSLNets")
         run_command(
-            "mcc -m run_FSL_Nets.m -o run_FSL_Nets"
+            "MATLABPATH="" mcc -m run_FSL_Nets.m -o run_FSL_Nets"
         )
         run_command(
-            "mcc -m run_SS_FSL_Nets.m -o run_SS_FSL_Nets"
+            "MATLABPATH="" mcc -m run_SS_FSL_Nets.m -o run_SS_FSL_Nets"
         )
+        os.chdir(cwd)
 
+        # Patch scripts to call compiled matlab versions of the functions
+        for script in [
+            "EddyPreprocessing.sh",
+            "QC_analysis.sh",
+            "Slice_Timing_Correction.sh",
+        ]:
+            run_command(f"cp {scripts_dir}/{script} {pipeline_dir}/BRC_functional_pipeline/scripts/{script}")
+        for script in [
+            "run_eddy.sh",
+        ]:
+            run_command(f"cp {scripts_dir}/{script} {pipeline_dir}/BRC_diffusion_pipeline/scripts/{script}")
+        for script in [
+            "Functional_Connectivity_Analysis.sh",
+            "SS_FC_Analysis.sh",
+        ]:
+            run_command(f"cp {scripts_dir}/{script} {pipeline_dir}/BRC_func_group_analysis/scripts/{script}")
 
 def _download_cuda(builddir):
     # Download CUDA deb files if not already present
@@ -138,9 +157,11 @@ def _download_cuda(builddir):
         # wget https://developer.download.nvidia.com/compute/cuda/12.1.1/local_installers/cuda_12.1.1_530.30.02_linux.run
         # sudo sh cuda_12.1.1_530.30.02_linux.run
 
-
-DEPS = [_download_freesurfer, _download_brc_pipeline, _download_cuda]
-
+DEPS = {
+    "freesurfer" : _download_freesurfer,
+    "brc-pipeline" : _download_brc_pipeline,
+    "cuda" : _download_cuda
+}
 
 def run_command(cmd, shell=True, capture_output=False, env=None):
     """Run a shell command and handle errors."""
@@ -183,6 +204,11 @@ def parse_args():
         "--no-build",
         action="store_true",
         help="Only create Dockerfiles without building images",
+    )
+    parser.add_argument(
+        "--no-dep",
+        help="Comma separated list of dependencies to ignore",
+        default="",
     )
     parser.add_argument(
         "--push",
@@ -543,9 +569,12 @@ def main():
         LOG.info(f"Bumping REBUILD_* values in: {args.bump}")
         _bump_rebuild_args(builddir, args.bump)
 
-    for dep in DEPS:
-        LOG.info(f"Checking for dependency: {dep}")
-        dep(builddir)
+
+    deps_to_skip = [p.strip() for p in args.no_dep.split(",")]
+    for dep, fn in DEPS.items():
+        if dep not in deps_to_skip:
+            LOG.info(f"Checking for dependency: {dep}")
+            fn(builddir)
 
     # Read private key so the build can access private repos
     if PRIVATE_KEY_FILE:
