@@ -5,7 +5,9 @@ RUN mkdir /usr/local/fsl && \
     python3 fslinstaller.py -o -d /usr/local/fsl/6.0.7.x -V 6.0.7.15 && \
     rm fslinstaller.py && \
     rm -rf /usr/local/fsl/6.0.7.x/pkgs && \
-    echo "source /usr/local/fsl/6.0.7.x/etc/fslconf/fsl.sh" >> /usr/local/envrc
+    echo "source /usr/local/fsl/6.0.7.x/etc/fslconf/fsl.sh" >> /usr/local/envrc && \
+    /usr/local/fsl/6.0.7.x/bin/python -m pip install --force-reinstall --no-cache-dir setuptools==81
+
 ENV FSLDIR=/usr/local/fsl/6.0.7.x \
     FSLOUTPUTTYPE=NIFTI_GZ \
     FSLGECUDAQ=cuda.q \
