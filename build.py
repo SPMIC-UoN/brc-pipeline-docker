@@ -35,6 +35,7 @@ PRODUCTS = {
             "dvars",
             "c3d",
             "brc-pipelines",
+            "minio",
         ],
         # "entrypoint": "bash",
         "entrypoint": "brc_pipeline",

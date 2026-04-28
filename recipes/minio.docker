@@ -1,0 +1,4 @@
+# Create minio python env and install
+ARG REBUILD_MINIO=1
+RUN micromamba env create -n minio python=3.12 minio && \
+    micromamba clean -a -y
