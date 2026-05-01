@@ -19,7 +19,11 @@ docker run martincraig/brc-pipeline <pipeline> [<args1> <arg2>...]
 
 ``pipeline`` is the name of the BRC pipeline script without .sh suffix, e.g. ``struc_preproc``, ``dMRI_preproc``...
 
-Arguments are specific to the pipeline, run without args to get a brief usage message
+Arguments are specific to the pipeline, run without args to get a brief usage message.
+
+Full documentation of the BRC pipeline scripts and inputs/outputs is found at:
+
+``https://github.com/SPMIC-UoN/BRC_Pipeline/wiki``
 
 Examples can be found in the ``test_scripts`` folder
 
@@ -57,5 +61,28 @@ Environment variables ``MINIO_ENDPOINT``, ``MINIO_ACCESS`` and ``MINIO_SECRET`` 
 set and passed to the container to support S3 URLs. If these are missing, or the Minio
 client cannot connect, S3 URLs will not be supported and all input files must be local
 file paths.
+
+``MINIO_ENDPOINT`` should include ``http`` or ``https`` prefix, the protocol will be 
+set to secure or not depending on this.
+
+If the MINIO server is running locally, the host name in ``MINIO_ENDPOINT`` should be 
+set to ``host.docker.internal``. If it is running on an external server, docker must
+be able to make external network connections.
+
+An example might look like this:
+
+```
+docker run -it -v $OUTDIR:/output \
+    -e MINIO_ENDPOINT="http://host.docker.internal:9000" \
+    -e MINIO_ACCESS="miniousername" \
+    -e MINIO_SECRET="miniopassword" \
+    martincraig/brc-pipeline \
+    struc_preproc \
+    --path /output/ \
+    --subject $SUBJID \
+    --input "s3://adni/$SUBJID/raw/Accelerated_Sagittal_MPRAGE_(MSV21)_Si.nii.gz" \
+    --t2 "s3://adni/$SUBJID/raw/Sagittal_3D_FLAIR_(MSV22)_Si.nii.gz" \
+    --regtype 3
+```
 
 There is currently no support for writing output back to an S3 bucket.
