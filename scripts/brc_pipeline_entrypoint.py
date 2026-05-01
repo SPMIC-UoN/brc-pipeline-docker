@@ -54,27 +54,34 @@ try:
         if env_vars[var] is None:
             raise ValueError(f"Environment variable MINIO_{var.upper()} not specified")
 
+    endpoint = urlparse(env_vars["endpoint"])
+    secure = endpoint.scheme == "https"
+
     minio_client = Minio(
-        env_vars["endpoint"],
+        endpoint.netloc,
         access_key=env_vars["access"],
         secret_key=env_vars["secret"],
-        secure=True
+        secure=secure
     )
 except Exception as exc:
     print(f"WARNING: Could not start Minio client: {exc} - will not be able to use S3 URLs as input")
     minio_client = None
 
-def _handle_s3(arg):
+def _handle_s3(client, arg, tmpdir):
     try:
         s3url = S3Url(arg)
-        local_fname = s3url.key.replace("/", "_")
-        local_path = os.path.join(tmpdir, local_fname)
-        minio_client.fget_object(s3url.bucket, s3url.key, local_path)
-        return local_path
     except Exception:
         return arg
 
+    try:
+        local_fname = s3url.key.replace("/", "_")
+        local_path = os.path.join(tmpdir, local_fname)
+        client.fget_object(s3url.bucket, s3url.key, local_path)
+        return local_path
+    except Exception as exc:
+        raise RuntimeError("S3 URL could not be downloaded") from exc
+
 with tempfile.TemporaryDirectory() as tmpdir:
     if minio_client is not None:
-        args = [_handle_s3(arg, tmpdir) for arg in args]
+        args = [_handle_s3(minio_client, arg, tmpdir) for arg in args]
     subprocess.run([script_name] + args, check=True)
