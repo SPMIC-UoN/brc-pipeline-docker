@@ -80,8 +80,8 @@ docker run -it -v $OUTDIR:/output \
     struc_preproc \
     --path /output/ \
     --subject $SUBJID \
-    --input "s3://adni/$SUBJID/raw/Accelerated_Sagittal_MPRAGE_(MSV21)_Si.nii.gz" \
-    --t2 "s3://adni/$SUBJID/raw/Sagittal_3D_FLAIR_(MSV22)_Si.nii.gz" \
+    --input "s3://data-bucket/$SUBJID/raw/Accelerated_Sagittal_MPRAGE_(MSV21)_Si.nii.gz" \
+    --t2 "s3://data-bucket/$SUBJID/raw/Sagittal_3D_FLAIR_(MSV22)_Si.nii.gz" \
     --regtype 3
 ```
 
