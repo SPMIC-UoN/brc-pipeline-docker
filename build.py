@@ -45,13 +45,15 @@ PRODUCTS = {
 }
 
 
-def _download_freesurfer(builddir):
+def _download_freesurfer(builddir, force=False):
     """
     Download and install FreeSurfer if not already present.
     """
     deps_dir = builddir / "_deps"
     deps_dir.mkdir(exist_ok=True)
     freesurfer7_dir = deps_dir / "freesurfer"
+    if force:
+        shutil.rmtree(freesurfer7_dir, ignore_errors=True)  # Remove old FreeSurfer if exists
     if not freesurfer7_dir.exists():
         freesurfer_tarball = "freesurfer-linux-ubuntu22_amd64-7.4.1.tar.gz"
 
@@ -96,13 +98,14 @@ def _download_freesurfer(builddir):
         pass
 
 
-def _download_brc_pipeline(builddir):
+def _download_brc_pipeline(builddir, force=False):
     # Clone BRC pipeline from git as we need to modify some of it and comple the matlab
     deps_dir = builddir / "_deps"
     scripts_dir = builddir / "scripts"
     deps_dir.mkdir(exist_ok=True)
     pipeline_dir = deps_dir / "BRC_Pipeline"
-    shutil.rmtree(pipeline_dir, ignore_errors=True)  # Remove old pipeline if exists
+    if force:
+        shutil.rmtree(pipeline_dir, ignore_errors=True)  # Remove old pipeline if exists
     if not pipeline_dir.exists():
         cwd = os.getcwd()
         os.chdir(deps_dir)
@@ -148,11 +151,13 @@ def _download_brc_pipeline(builddir):
         ]:
             run_command(f"cp {scripts_dir}/{script} {pipeline_dir}/BRC_func_group_analysis/scripts/{script}")
 
-def _download_cuda(builddir):
+def _download_cuda(builddir, force=False):
     # Download CUDA deb files if not already present
     deps_dir = builddir / "_deps"
     deps_dir.mkdir(exist_ok=True)
     cuda_dir = deps_dir / "cuda"
+    if force:
+        shutil.rmtree(cuda_dir, ignore_errors=True)  # Remove old CUDA if exists
     if not cuda_dir.exists():
         cuda_dir.mkdir()
         # wget https://developer.download.nvidia.com/compute/cuda/12.1.1/local_installers/cuda_12.1.1_530.30.02_linux.run
@@ -207,8 +212,8 @@ def parse_args():
         help="Only create Dockerfiles without building images",
     )
     parser.add_argument(
-        "--no-dep",
-        help="Comma separated list of dependencies to ignore",
+        "--dep-force",
+        help="Comma separated list of dependencies to force upload of",
         default="",
     )
     parser.add_argument(
@@ -571,11 +576,20 @@ def main():
         _bump_rebuild_args(builddir, args.bump)
 
 
-    deps_to_skip = [p.strip() for p in args.no_dep.split(",")]
+    deps_to_force = [
+        p.strip().lower()
+        for p in args.dep_force.split(",")
+        if p.strip()
+    ]
+
+    if [p for p in deps_to_force if p not in DEPS]:
+        LOG.error(f"Invalid dependency specified in --dep-force: {args.dep_force}")
+        LOG.error(f"Valid dependencies are: {', '.join(DEPS.keys())}")
+        sys.exit(1)
+
     for dep, fn in DEPS.items():
-        if dep not in deps_to_skip:
-            LOG.info(f"Checking for dependency: {dep}")
-            fn(builddir)
+        LOG.info(f"Checking for dependency: {dep}")
+        fn(builddir, force=(dep.lower() in deps_to_force))
 
     # Read private key so the build can access private repos
     if PRIVATE_KEY_FILE:
