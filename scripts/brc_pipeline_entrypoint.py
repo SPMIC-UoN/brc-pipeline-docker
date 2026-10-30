@@ -99,7 +99,12 @@ def main():
         print("Usage: python brc_pipeline_entrypoint.py <script_name> <args>")
         return 1
     if sys.argv[1] in ("--version", "-v"):
-        print("v0.0.1")
+        try:
+            with open("/usr/local/BRC_Pipeline/version.txt", "r") as f:
+                version = f.read().strip().replace("Ver", "v")
+        except FileNotFoundError:
+            version = "unknown"
+        print(version)
         return 0
 
     script = sys.argv[1] + ".sh"
