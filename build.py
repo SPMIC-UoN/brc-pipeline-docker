@@ -468,7 +468,7 @@ def _build_image(product, config, builddir, priv_key, buildscript_version, args)
 
     LOG.info(f"Building {product} docker image")
 
-    build_cmd = "docker buildx build --sbom=true"
+    build_cmd = "docker buildx build"
     if args.no_cache:
         build_cmd += " --no-cache"
     if args.save_contents:
