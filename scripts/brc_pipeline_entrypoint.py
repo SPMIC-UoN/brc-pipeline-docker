@@ -15,6 +15,16 @@ except ImportError:
 LOG = logging.getLogger(__name__)
 LOG_LEVEL = os.environ.get("BRC_PIPELINE_LOG_LEVEL", "INFO").upper()
 
+def _get_var(var):
+    ALTERNATES = {
+        "endpoint" : "endPoint",
+        "access" : "accessKey",
+        "secret" : "secretKey",
+    }
+    value = os.environ.get("MINIO_" + var.upper(), None)
+    if not value:
+        value = os.environ.get(ALTERNATES.get(var, None), None)
+    return value
 
 class S3Url(object):
     """
