@@ -20,10 +20,13 @@ def _get_var(var):
         "endpoint" : "endPoint",
         "access" : "accessKey",
         "secret" : "secretKey",
+        "bucket" : "submissionBucket",
     }
     value = os.environ.get("MINIO_" + var.upper(), None)
     if not value:
         value = os.environ.get(ALTERNATES.get(var, None), None)
+    if value is None:
+        raise ValueError(f"Could not find MINIO environment variable '{var}' - tried MINIO_{var.upper} and {ALTERNATES.get(var, None)}")
     return value
 
 class S3Url(object):
@@ -50,7 +53,7 @@ class S3Url(object):
     def url(self):
         return self._parsed.geturl()
 
-def _handle_s3(client, arg, tmpdir):
+def _handle_s3(client, arg, env_vars, tmpdir):
     """
     Check if a command line argument looks like and S3 URL, and if so download it to a local temp file
 
@@ -58,6 +61,8 @@ def _handle_s3(client, arg, tmpdir):
     (.bval, .bvec, .json). So if we have a Nifti file reference, we will also download other files with the
     same stem but different extensions.
     """
+    if "bucket" in env_vars:
+        arg = arg.replace("s3://", "s3://" + env_vars.get("bucket") + "/")
     try:
         s3url = S3Url(arg)
     except Exception:
@@ -130,10 +135,8 @@ def main():
     try:
         from minio import Minio
         env_vars = {}
-        for var in ("endpoint", "access", "secret"):
-            env_vars[var] = os.environ.get("MINIO_" + var.upper(), None)
-            if env_vars[var] is None:
-                raise ValueError(f"Environment variable MINIO_{var.upper()} not specified")
+        for var in ("endpoint", "access", "secret", "bucket"):
+            env_vars[var] = _get_var(var)
 
         endpoint = urlparse(env_vars["endpoint"])
         secure = endpoint.scheme == "https"
@@ -155,7 +158,7 @@ def main():
 
     with tempfile.TemporaryDirectory() as tmpdir:
         if minio_client is not None:
-            args = [_handle_s3(minio_client, arg, tmpdir) for arg in args]
+            args = [_handle_s3(minio_client, arg, env_vars, tmpdir) for arg in args]
         subprocess.run([script_name] + args, check=True)
 
     return 0
